@@ -1,8 +1,9 @@
 import axios from "axios";
+import { API_BASE_URL } from '../../config/api';
 
-// API Configuration
+// API Configuration with dynamic URL
 const API = axios.create({
-  baseURL: "http://127.0.0.1:8000/api",
+  baseURL: API_BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
