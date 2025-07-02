@@ -6,6 +6,8 @@
   justify-content: center;
   padding: 20px;
   overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
 }
 
 .section-description {
@@ -17,8 +19,9 @@
 
 .rizz-styles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 16px;
+  margin-top: 16px;
   width: 100%;
 }
 
@@ -62,23 +65,50 @@
 }
 
 .rizz-style-content {
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 4px;
+  flex: 1;
+  min-width: 0;
 }
 
 .rizz-style-label {
   font-size: 16px;
   font-weight: 600;
-  color: #ffffff;
-  line-height: 1.2;
+  color: #fff;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .rizz-style-description {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.7);
-  line-height: 1.3;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+}
+
+.main-card {
+  width: 100%;
+  max-width: 600px;
+  padding: 32px;
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .dot.completed {
@@ -88,6 +118,18 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .main-card {
+    padding: 24px 16px;
+    min-height: 80vh;
+  }
+  
+  .rizz-styles-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .rizz-style-button {
+    padding: 14px 16px;
+  }
   .rizz-styles-grid {
     grid-template-columns: 1fr;
     gap: 12px;
@@ -114,6 +156,24 @@
 }
 
 @media (max-width: 480px) {
+  .main-card {
+    padding: 20px 12px;
+    min-height: 85vh;
+  }
+  
+  .rizz-style-emoji {
+    width: 42px;
+    height: 42px;
+    font-size: 24px;
+  }
+  
+  .rizz-style-label {
+    font-size: 15px;
+  }
+  
+  .rizz-style-description {
+    font-size: 13px;
+  }
   .step-two-page {
     padding: 16px;
   }

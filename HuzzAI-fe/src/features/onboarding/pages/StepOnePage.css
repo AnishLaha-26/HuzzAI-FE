@@ -6,6 +6,8 @@
   justify-content: center;
   padding: 20px;
   overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
 }
 
 .content-container {
@@ -27,6 +29,11 @@
   flex-direction: column;
   position: relative;
   z-index: 10;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .header-section {
@@ -111,9 +118,10 @@
 }
 
 .options-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
 }
 
 .options-grid.single-option {
@@ -121,24 +129,70 @@
 }
 
 .option-button {
-  padding: 12px 20px;
+  padding: 16px 20px;
   font-size: 14px;
   font-weight: 500;
   border-radius: 20px;
   white-space: nowrap;
   min-width: fit-content;
   flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.option-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.option-button.selected,
+.glass-button.option-button.selected {
+  background: rgba(255, 87, 87, 0.8) !important;
+  border: 1px solid rgba(255, 87, 87, 0.9) !important;
+  box-shadow: 0 0 20px rgba(255, 87, 87, 0.3) !important;
+  transform: translateY(-1px);
+  color: white !important;
+}
+
+.option-emoji {
+  font-size: 24px;
+  margin-bottom: 4px;
+  transition: transform 0.3s ease;
+}
+
+.option-button:hover .option-emoji {
+  transform: scale(1.1);
+}
+
+.option-button.selected .option-emoji {
+  transform: scale(1.15);
+}
+
+.option-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  line-height: 1.2;
 }
 
 .frequency-option {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 16px;
+  min-width: 100px;
+  padding: 18px 16px;
 }
 
-.frequency-option span {
-  font-size: 14px;
+.frequency-option .option-emoji {
+  font-size: 28px;
+}
+
+.frequency-option .option-label {
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .error-text {
@@ -229,7 +283,20 @@
   }
   
   .options-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     gap: 8px;
+  }
+  
+  .option-button {
+    padding: 12px 16px;
+  }
+  
+  .option-emoji {
+    font-size: 20px;
+  }
+  
+  .option-label {
+    font-size: 12px;
   }
   
   .option-button {

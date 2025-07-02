@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useOnboardingStore } from '../store/onboardingStore';
+import { useNavigate } from 'react-router-dom';
 import './FinalSubmit.css';
 
 interface FinalSubmitProps {
@@ -8,11 +9,20 @@ interface FinalSubmitProps {
 }
 
 export const FinalSubmit: React.FC<FinalSubmitProps> = ({ onSubmit, onBack }) => {
-  const { formData } = useOnboardingStore();
+  const { formData, submitPreferences, isSubmitting, submissionError } = useOnboardingStore();
+  const navigate = useNavigate();
+  const [localError, setLocalError] = useState<string | null>(null);
 
-  const handleSubmit = () => {
-    // You can add any final processing here
-    onSubmit();
+  const handleSubmit = async () => {
+    setLocalError(null);
+    try {
+      await submitPreferences();
+      // Navigate to dashboard or home page after successful submission
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Failed to submit preferences:', error);
+      setLocalError('Failed to save your preferences. Please try again.');
+    }
   };
 
   return (
@@ -131,8 +141,24 @@ export const FinalSubmit: React.FC<FinalSubmitProps> = ({ onSubmit, onBack }) =>
           </div>
           
           <div className="footer-section">
-            <button className="continue-button launch-button" onClick={handleSubmit}>
-              Launch HuzzAI 🚀
+            {(submissionError || localError) && (
+              <div className="error-message" style={{ 
+                color: '#ff6b6b', 
+                background: 'rgba(255, 107, 107, 0.1)', 
+                padding: '10px', 
+                borderRadius: '8px', 
+                marginBottom: '20px',
+                textAlign: 'center'
+              }}>
+                {submissionError || localError}
+              </div>
+            )}
+            <button 
+              className={`continue-button launch-button ${isSubmitting ? 'loading' : ''}`}
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Saving...' : 'Launch HuzzAI 🚀'}
             </button>
           </div>
         </div>

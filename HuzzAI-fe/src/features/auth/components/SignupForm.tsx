@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { register } from "../auth.api";
+import { authAPI, type RegisterData } from "../auth.api";
 import { useAuth } from "../userauth";
+import { useNavigate } from "react-router-dom";
 
 export default function SignupForm() {
   const { setAuth } = useAuth();
@@ -12,6 +13,8 @@ export default function SignupForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const navigate = useNavigate();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -21,12 +24,42 @@ export default function SignupForm() {
       return;
     }
 
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters long");
+      return;
+    }
+
     setLoading(true);
     try {
-      const data = await register({ email, password });
-      setAuth(data);
-    } catch (err) {
-      setError("Registration failed");
+      const registerData: RegisterData = {
+        email,
+        password,
+        password2: confirmPassword,
+        first_name: firstName,
+        last_name: lastName
+      };
+      
+      const response = await authAPI.register(registerData);
+      
+      // Set auth with the correct format
+      setAuth({
+        accessToken: response.access,
+        user: response.user
+      });
+      
+      // Navigate to onboarding after successful registration
+      navigate('/onboarding/step1');
+    } catch (err: any) {
+      console.error('Registration error:', err);
+      if (err.response?.data?.email) {
+        setError('Email already exists or is invalid');
+      } else if (err.response?.data?.password) {
+        setError('Password requirements not met');
+      } else if (err.response?.data?.non_field_errors) {
+        setError(err.response.data.non_field_errors[0]);
+      } else {
+        setError('Registration failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -44,7 +77,7 @@ export default function SignupForm() {
               onChange={(e) => setFirstName(e.target.value)}
               required
               className="glass-input"
-              placeholder="Enter your first name"
+              placeholder="First name"
             />
           </div>
           <div className="form-group half">
@@ -55,7 +88,7 @@ export default function SignupForm() {
               onChange={(e) => setLastName(e.target.value)}
               required
               className="glass-input"
-              placeholder="Enter your last name"
+              placeholder="Last name"
             />
           </div>
         </div>

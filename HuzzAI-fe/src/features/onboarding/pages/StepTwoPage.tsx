@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useOnboardingStore } from '../store/onboardingStore';
+import { useOnboardingStore, type RizzStyle } from '../store/onboardingStore';
 import './StepTwoPage.css';
 
 interface StepTwoPageProps {
@@ -27,7 +27,7 @@ export const StepTwoPage: React.FC<StepTwoPageProps> = ({ onNext, onBack }) => {
     onNext();
   };
 
-  const rizzStyleOptions = [
+  const rizzStyleOptions: Array<{ value: RizzStyle; label: string; description: string; emoji: string }> = [
     { 
       value: 'confident', 
       label: 'Confident & Direct',
@@ -66,14 +66,15 @@ export const StepTwoPage: React.FC<StepTwoPageProps> = ({ onNext, onBack }) => {
     }
   ];
 
-  const toggleRizzStyle = (style: string) => {
+  const toggleRizzStyle = (style: RizzStyle) => {
     const currentStyles = formData.rizzStyles || [];
-    let newStyles;
+    const newStyles: RizzStyle[] = [...currentStyles];
     
-    if (currentStyles.includes(style)) {
-      newStyles = currentStyles.filter(s => s !== style);
+    const styleIndex = newStyles.indexOf(style);
+    if (styleIndex > -1) {
+      newStyles.splice(styleIndex, 1);
     } else {
-      newStyles = [...currentStyles, style];
+      newStyles.push(style);
     }
     
     updateFormData({ rizzStyles: newStyles });
@@ -156,9 +157,7 @@ export const StepTwoPage: React.FC<StepTwoPageProps> = ({ onNext, onBack }) => {
           </div>
           
           <div className="footer-section">
-            <div className="step-indicator">
-              <span>Step 2 of 4</span>
-            </div>
+            
             <button className="continue-button" onClick={validateAndNext}>
               Continue →
             </button>

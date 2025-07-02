@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import  { useOnboardingStore } from '../store/onboardingStore';
+import { useOnboardingStore } from '../store/onboardingStore';
 import './StepOnePage.css';
 
 interface StepOnePageProps {
@@ -26,9 +26,7 @@ export const StepOnePage: React.FC<StepOnePageProps> = ({ onNext, onBack }) => {
     if (!formData.goals) {
       newErrors.goals = 'Please select your goal';
     }
-    if (!formData.relationshipStatus) {
-      newErrors.relationshipStatus = 'Please answer this question';
-    }
+
     if (!formData.datingFrequency) {
       newErrors.datingFrequency = 'Please select an option';
     }
@@ -43,31 +41,33 @@ export const StepOnePage: React.FC<StepOnePageProps> = ({ onNext, onBack }) => {
   };
 
   const genderOptions = [
-    { value: 'male', label: 'Male' },
-    { value: 'female', label: 'Female' },
-    { value: 'non-binary', label: 'Non-Binary' }
+    { value: 'M' as const, label: 'Male', emoji: '👨' },
+    { value: 'F' as const, label: 'Female', emoji: '👩' },
+    { value: 'O' as const, label: 'Other', emoji: '🌈' },
+    { value: 'PNTS' as const, label: 'Prefer not to say', emoji: '🤐' }
   ];
 
   const ageOptions = [
-    { value: 'under-18', label: 'Under 18' },
-    { value: '18-24', label: '18-24' },
-    { value: '25-34', label: '25-34' },
-    { value: '35-44', label: '35-44' },
-    { value: '45+', label: '45+' }
+    { value: '<18' as const, label: '<18', emoji: '🌟' },
+    { value: '18-24' as const, label: '18-24', emoji: '🚀' },
+    { value: '25-34' as const, label: '25-34', emoji: '💪' },
+    { value: '35-44' as const, label: '35-44', emoji: '🏆' },
+    { value: '45+' as const, label: '45+', emoji: '👑' }
   ];
 
   const goalOptions = [
-    { value: 'relationship', label: 'Relationship' },
-    { value: 'casual', label: 'Casual' },
-    { value: 'fun', label: 'Fun' }
+    { value: 'LTR' as const, label: 'Long-term', emoji: '💕' },
+    { value: 'STD' as const, label: 'Short-term', emoji: '💫' },
+    { value: 'CAS' as const, label: 'Casual', emoji: '😎' },
+    { value: 'FRD' as const, label: 'Friends', emoji: '🤝' }
   ];
 
   const datingFrequencyOptions = [
-    { value: 'not-even-1', label: 'Not even 1' },
-    { value: '1-2', label: '1-2' },
-    { value: '3-6', label: '3-6' },
-    { value: '7-10', label: '7-10' },
-    { value: '10+', label: '10+' }
+    { value: 'not-even-1', label: 'Not even 1', emoji: '🚫' },
+    { value: '1-2', label: '1-2', emoji: '😊' },
+    { value: '3-6', label: '3-6', emoji: '🧡' },
+    { value: '7-10', label: '7-10', emoji: '🤩' },
+    { value: '10+', label: '10+', emoji: '⚡' }
   ];
 
   return (
@@ -132,7 +132,8 @@ export const StepOnePage: React.FC<StepOnePageProps> = ({ onNext, onBack }) => {
                       }`}
                       onClick={() => updateFormData({ gender: option.value })}
                     >
-                      {option.label}
+                      <span className="option-emoji">{option.emoji}</span>
+                      <span className="option-label">{option.label}</span>
                     </button>
                   ))}
                 </div>
@@ -150,7 +151,8 @@ export const StepOnePage: React.FC<StepOnePageProps> = ({ onNext, onBack }) => {
                       }`}
                       onClick={() => updateFormData({ age: option.value })}
                     >
-                      {option.label}
+                      <span className="option-emoji">{option.emoji}</span>
+                      <span className="option-label">{option.label}</span>
                     </button>
                   ))}
                 </div>
@@ -168,25 +170,12 @@ export const StepOnePage: React.FC<StepOnePageProps> = ({ onNext, onBack }) => {
                       }`}
                       onClick={() => updateFormData({ goals: option.value })}
                     >
-                      {option.label}
+                      <span className="option-emoji">{option.emoji}</span>
+                      <span className="option-label">{option.label}</span>
                     </button>
                   ))}
                 </div>
                 {errors.goals && <span className="error-text">{errors.goals}</span>}
-              </div>
-              
-              <div className="form-section">
-                <h3 className="section-title">I'm in a relationship</h3>
-                <div className="options-grid single-option">
-                  <button
-                    className={`glass-button option-button ${
-                      formData.relationshipStatus === 'in-relationship' ? 'selected' : ''
-                    }`}
-                    onClick={() => updateFormData({ relationshipStatus: formData.relationshipStatus === 'in-relationship' ? '' : 'in-relationship' })}
-                  >
-                    I'm in a relationship
-                  </button>
-                </div>
               </div>
               
               <div className="form-section">
@@ -200,12 +189,8 @@ export const StepOnePage: React.FC<StepOnePageProps> = ({ onNext, onBack }) => {
                       }`}
                       onClick={() => updateFormData({ datingFrequency: option.value })}
                     >
-                      {option.value === 'not-even-1' && '🚫'}
-                      {option.value === '1-2' && '😊'}
-                      {option.value === '3-6' && '🧡'}
-                      {option.value === '7-10' && '🤩'}
-                      {option.value === '10+' && '⚡'}
-                      <span>{option.label}</span>
+                      <span className="option-emoji">{option.emoji}</span>
+                      <span className="option-label">{option.label}</span>
                     </button>
                   ))}
                 </div>
@@ -215,9 +200,7 @@ export const StepOnePage: React.FC<StepOnePageProps> = ({ onNext, onBack }) => {
           </div>
           
           <div className="footer-section">
-            <div className="step-indicator">
-              <span>1/4</span>
-            </div>
+          
             <button className="continue-button" onClick={validateAndNext}>
               Continue →
             </button>

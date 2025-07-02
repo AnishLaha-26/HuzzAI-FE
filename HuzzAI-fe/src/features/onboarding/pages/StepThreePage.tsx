@@ -2,6 +2,16 @@ import React, { useState } from 'react';
 import { useOnboardingStore } from '../store/onboardingStore';
 import './StepThreePage.css';
 
+// These values must match exactly what the backend expects
+type PlatformType = 'tinder' | 'bumble' | 'hinge' | 'instagram' | 'whatsapp' | 'telegram';
+
+interface PlatformOption {
+  value: PlatformType;
+  label: string;
+  description: string;
+  emoji: string;
+}
+
 interface StepThreePageProps {
   onNext: () => void;
   onBack: () => void;
@@ -27,7 +37,7 @@ export const StepThreePage: React.FC<StepThreePageProps> = ({ onNext, onBack }) 
     onNext();
   };
 
-  const platformOptions = [
+  const platformOptions: PlatformOption[] = [
     { 
       value: 'tinder', 
       label: 'Tinder',
@@ -127,7 +137,7 @@ export const StepThreePage: React.FC<StepThreePageProps> = ({ onNext, onBack }) 
                       className={`glass-button platform-button ${
                         formData.platform === option.value ? 'selected' : ''
                       }`}
-                      onClick={() => updateFormData({ platform: option.value })}
+                      onClick={() => updateFormData({ platform: option.value as PlatformType })}
                     >
                       <div className="platform-emoji">{option.emoji}</div>
                       <div className="platform-content">
@@ -143,9 +153,7 @@ export const StepThreePage: React.FC<StepThreePageProps> = ({ onNext, onBack }) 
           </div>
           
           <div className="footer-section">
-            <div className="step-indicator">
-              <span>Step 3 of 4</span>
-            </div>
+            
             <button className="continue-button" onClick={validateAndNext}>
               Continue →
             </button>

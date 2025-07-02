@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { login } from "../auth.api";
-import  { useAuth } from "../userauth";
+import { authAPI, type LoginData } from "../auth.api";
+import { useAuth } from "../userauth";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginForm() {
   const { setAuth } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -13,11 +15,28 @@ export default function LoginForm() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    
     try {
-      const data = await login({ email, password });
-      setAuth(data);
-    } catch (err) {
-      setError("Invalid credentials");
+      const loginData: LoginData = { email, password };
+      const response = await authAPI.login(loginData);
+      
+      // Set auth with the correct format
+      setAuth({
+        accessToken: response.access,
+        user: response.user
+      });
+      
+      // Navigate to dashboard or home after successful login
+      navigate('/dashboard');
+    } catch (err: any) {
+      console.error('Login error:', err);
+      if (err.response?.status === 401) {
+        setError('Invalid email or password');
+      } else if (err.response?.data?.non_field_errors) {
+        setError(err.response.data.non_field_errors[0]);
+      } else {
+        setError('Login failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
