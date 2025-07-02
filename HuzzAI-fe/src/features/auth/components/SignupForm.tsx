@@ -4,6 +4,8 @@ import { useAuth } from "../userauth";
 
 export default function SignupForm() {
   const { setAuth } = useAuth();
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -31,56 +33,79 @@ export default function SignupForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-      <div>
-        <label style={{ display: "block", marginBottom: "0.5rem" }}>Email</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          style={{ width: "100%", padding: "0.5rem", borderRadius: "4px", border: "1px solid #ccc" }}
-        />
-      </div>
+    <>
+      <form onSubmit={handleSubmit}>
+        <div className="name-row">
+          <div className="form-group half">
+            <label className="form-label">First Name</label>
+            <input
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+              className="glass-input"
+              placeholder="Enter your first name"
+            />
+          </div>
+          <div className="form-group half">
+            <label className="form-label">Last Name</label>
+            <input
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              required
+              className="glass-input"
+              placeholder="Enter your last name"
+            />
+          </div>
+        </div>
 
-      <div>
-        <label style={{ display: "block", marginBottom: "0.5rem" }}>Password</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          style={{ width: "100%", padding: "0.5rem", borderRadius: "4px", border: "1px solid #ccc" }}
-        />
-      </div>
+        <div className="form-group">
+          <label className="form-label">Email</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="glass-input"
+            placeholder="Enter your email"
+          />
+        </div>
 
-      <div>
-        <label style={{ display: "block", marginBottom: "0.5rem" }}>Confirm Password</label>
-        <input
-          type="password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          required
-          style={{ width: "100%", padding: "0.5rem", borderRadius: "4px", border: "1px solid #ccc" }}
-        />
-      </div>
+        <div className="form-group">
+          <label className="form-label">Password</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="glass-input"
+            placeholder="Enter your password"
+          />
+        </div>
 
-      {error && <p style={{ color: "red", fontSize: "0.9rem" }}>{error}</p>}
+        <div className="form-group">
+          <label className="form-label">Confirm Password</label>
+          <input
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            className="glass-input"
+            placeholder="Confirm your password"
+          />
+        </div>
 
-      <button
-        type="submit"
-        disabled={loading}
-        style={{
-          backgroundColor: "#28a745",
-          color: "white",
-          padding: "0.75rem",
-          border: "none",
-          borderRadius: "4px",
-          cursor: "pointer"
-        }}
-      >
-        {loading ? "Signing up..." : "Sign Up"}
-      </button>
-    </form>
+        {error && <div className="error-message">{error}</div>}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="signup-button-main"
+        >
+          {loading ? "Creating Account..." : "Create Account"}
+        </button>
+      </form>
+    </>
   );
 }
