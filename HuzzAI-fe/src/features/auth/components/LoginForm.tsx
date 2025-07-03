@@ -27,8 +27,8 @@ export default function LoginForm() {
         user: response.user
       });
       
-      // Navigate to dashboard or home after successful login
-      navigate('/dashboard');
+      // Navigate to loading screen after successful login
+      navigate('/loading');
     } catch (err: any) {
       console.error('Login error:', err);
       if (err.response?.status === 401) {
