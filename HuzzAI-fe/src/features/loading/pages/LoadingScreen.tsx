@@ -117,7 +117,7 @@ export const LoadingScreen = () => {
     // Simple 30 second timer
     const timer = setTimeout(() => {
       navigate('/dashboard');
-    }, 30000); // 30 seconds total
+    }, 10000); // 30 seconds total
 
     // Change tips every 6 seconds with random selection
     const tipInterval = setInterval(() => {

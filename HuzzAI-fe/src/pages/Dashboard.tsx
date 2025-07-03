@@ -159,7 +159,13 @@ export const Dashboard: React.FC = () => {
               className={`tab ${activeTab === 'analysis' ? 'active' : ''}`}
               onClick={() => setActiveTab('analysis')}
             >
-              📊 Analyze your Rizz
+              📊 Analyze my Rizz
+            </button>
+            <button
+              className={`tab ${activeTab === 'fine-tune' ? 'active' : ''}`}
+              onClick={() => setActiveTab('fine-tune')}
+            >
+             ✨ Fine-tune my Rizz
             </button>
           </div>
         </div>
@@ -176,15 +182,6 @@ export const Dashboard: React.FC = () => {
         )}
       </div>
 
-      {/* Bottom Navigation Bar */}
-      <div className="bottom-navbar">
-        <button className="nav-btn active" title="Home">
-          🏠
-        </button>
-        <button className="nav-btn" onClick={handleLogout} title="Settings">
-          ⚙️
-        </button>
-      </div>
     </div>
   );
 };
