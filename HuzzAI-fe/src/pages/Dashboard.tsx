@@ -2,10 +2,14 @@ import React from 'react';
 import { useAuth } from '../features/auth/userauth';
 import { authAPI } from '../features/auth/auth.api';
 import { useNavigate } from 'react-router-dom';
+import { useState, useRef } from 'react';
+import './Dashboard.css';
 
 export const Dashboard: React.FC = () => {
   const { auth, logout } = useAuth();
   const navigate = useNavigate();
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleLogout = () => {
     authAPI.logout();
@@ -13,22 +17,63 @@ export const Dashboard: React.FC = () => {
     navigate('/login');
   };
 
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setSelectedImage(imageUrl);
+      // Here you can handle the image file (upload to server, etc.)
+      console.log('Selected file:', file);
+    }
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
+
   return (
-    <div style={{ 
-      padding: '40px', 
-      textAlign: 'center',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      minHeight: '100vh',
-      color: 'white'
-    }}>
-      <div style={{
-        background: 'rgba(255, 255, 255, 0.1)',
-        backdropFilter: 'blur(10px)',
-        borderRadius: '20px',
-        padding: '40px',
-        maxWidth: '600px',
-        margin: '0 auto'
-      }}>
+    <div className="dashboard-container">
+      <div className="dashboard-content">
+        <h1>Welcome to Your Dashboard</h1>
+        
+        {/* Upload Button */}
+        <div className="upload-section">
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleImageChange}
+            accept="image/*"
+            style={{ display: 'none' }}
+          />
+          <button 
+            className="upload-button"
+            onClick={triggerFileInput}
+          >
+            Upload Screenshot
+          </button>
+          
+          {selectedImage && (
+            <div className="image-preview">
+              <img 
+                src={selectedImage} 
+                alt="Preview" 
+                style={{ 
+                  maxWidth: '100%', 
+                  borderRadius: '12px',
+                  marginTop: '20px',
+                  border: '2px solid rgba(255, 255, 255, 0.2)'
+                }} 
+              />
+            </div>
+          )}
+        </div>
+
+        <button 
+          onClick={handleLogout} 
+          className="logout-button"
+        >
+          Logout
+        </button>
         <h1>🎉 Welcome to HuzzAI Dashboard!</h1>
         <p>Congratulations! You've successfully completed the onboarding process.</p>
         

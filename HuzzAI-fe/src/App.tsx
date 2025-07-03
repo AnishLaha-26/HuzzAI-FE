@@ -4,6 +4,7 @@ import { AuthProvider } from './features/auth/userauth';
 import LoginPage from './features/auth/pages/LoginPage';
 import SignupPage from './features/auth/pages/SignupPage';
 import ForgotPage from './features/auth/pages/ForgotPage';
+import ForgotMessagePage from './features/auth/pages/ForgotMessagePage';
 import ResetPage from './features/auth/pages/ResetPage';
 import { OnboardingFlow } from './features/onboarding/OnboardingFlow';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -18,6 +19,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/forgot-password" element={<ForgotPage />} />
+            <Route path="/forgot-password/message" element={<ForgotMessagePage />} />
             <Route path="/reset-password/:token" element={<ResetPage />} />
             <Route path="/onboarding/*" element={
               <ProtectedRoute>
