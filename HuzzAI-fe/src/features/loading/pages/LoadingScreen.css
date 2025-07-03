@@ -136,20 +136,12 @@
 
 .huzz-title-text {
   font-size: 2.5rem;
-  font-weight: 800;
+  font-weight: 700;
   margin: 0;
   color: #ffffff;
-  background: linear-gradient(45deg, #ffffff, #f0f9ff, #e0e7ff, #ffffff);
-  background-size: 300% 300%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: gradientShift 4s ease-in-out infinite;
-  text-shadow: 
-    0 0 20px rgba(255, 255, 255, 0.8),
-    0 0 40px rgba(139, 92, 246, 0.6),
-    0 2px 4px rgba(0, 0, 0, 0.3);
-  letter-spacing: 0.1em;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   /* Fallback for browsers that don't support background-clip */
   -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
 }

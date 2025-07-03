@@ -1,15 +1,66 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../features/auth/userauth';
 import { authAPI } from '../features/auth/auth.api';
 import { useNavigate } from 'react-router-dom';
-import { useState, useRef } from 'react';
 import './Dashboard.css';
+
+const RIZZ_DROPS = [
+  "You look like you ghost people and still get missed.",
+  "Trouble in your eyes, peace in your vibe. Dangerous combo.",
+  "Let's skip small talk. What's your love language?",
+  "You're the type of person I'd delete dating apps for.",
+  "Your vibe is unmatched, but let's match anyway.",
+  "I don't usually believe in love at first sight, but I'm willing to be wrong.",
+  "You're not just a snack, you're the whole meal prep.",
+  "I'd cross timezones just to hear you laugh."
+];
+
+const STEPS = [
+  {
+    number: 1,
+    icon: '📸',
+    title: 'Upload Screenshot',
+    description: 'Add any chat, bio, or convo you want upgraded.'
+  },
+  {
+    number: 2,
+    icon: '🧠',
+    title: 'AI Reads the Room',
+    description: 'Understands your vibe, goal, and tone.'
+  },
+  {
+    number: 3,
+    icon: '💬',
+    title: 'Get Flirty Firepower',
+    description: 'Returns 3–5 clever message rewrites.'
+  }
+];
 
 export const Dashboard: React.FC = () => {
   const { auth, logout } = useAuth();
   const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [currentRizzDrop, setCurrentRizzDrop] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [activeTab, setActiveTab] = useState('analysis');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Auto-rotate rizz drops every 8 seconds
+  useEffect(() => {
+    const rizzInterval = setInterval(() => {
+      setCurrentRizzDrop(prev => (prev + 1) % RIZZ_DROPS.length);
+    }, 5000);
+
+    // Auto-advance carousel every 5 seconds
+    const carouselInterval = setInterval(() => {
+      setCurrentStep(prev => (prev + 1) % STEPS.length);
+    }, 1500);
+
+    return () => {
+      clearInterval(rizzInterval);
+      clearInterval(carouselInterval);
+    };
+  }, []);
 
   const handleLogout = () => {
     authAPI.logout();
@@ -22,7 +73,6 @@ export const Dashboard: React.FC = () => {
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       setSelectedImage(imageUrl);
-      // Here you can handle the image file (upload to server, etc.)
       console.log('Selected file:', file);
     }
   };
@@ -31,13 +81,64 @@ export const Dashboard: React.FC = () => {
     fileInputRef.current?.click();
   };
 
+  const handleRizzDropRefresh = () => {
+    setCurrentRizzDrop(prev => (prev + 1) % RIZZ_DROPS.length);
+  };
+
+  const getGreetingText = () => {
+    if (auth?.user?.first_name) {
+      return `Hey ${auth.user.first_name}, ready to rizz again?`;
+    }
+    return "👋 Welcome to the game!";
+  };
+
   return (
     <div className="dashboard-container">
-      <div className="dashboard-content">
-        <h1>Welcome to Your Dashboard</h1>
-        
-        {/* Upload Button */}
-        <div className="upload-section">
+      <div className="window-container">
+        <div className="dashboard-content">
+          {/* Header Logo + Greeting */}
+          <div className="header-section">
+            <div className="dashboard-header">
+              <div className="branding">
+                <img src="/huzzlogo.png" alt="Logo" className="logo-img" />
+                <h1 className="brand-title">HuzzAI</h1>
+              </div>
+              <p className="greeting">{getGreetingText()}</p>
+            </div>
+          </div>
+
+          {/* Steps Carousel */}
+          <div className="steps-section">
+            <div className="step-carousel">
+              <div className="step-display">
+                <div className="step-number">{STEPS[currentStep].number}</div>
+                <div className="step-content">
+                  <div className="step-header">
+                    <div className="step-icon">{STEPS[currentStep].icon}</div>
+                    <h3 className="step-title">{STEPS[currentStep].title}</h3>
+                  </div>
+                  <p className="step-description">{STEPS[currentStep].description}</p>
+                </div>
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+
+        {/* === Section 3: Rizz Drop Window === */}
+        <div className="rizz-window">
+          <h2 className="section-title">🔥 Today's Rizz Drop</h2>
+          <div className="rizz-bubble">
+            <p className="rizz-text">
+              {RIZZ_DROPS[currentRizzDrop]}
+            </p>
+          </div>
+        </div>
+
+
+        {/* Main Action Button */}
+        <div className="main-action-section">
           <input
             type="file"
             ref={fileInputRef}
@@ -45,68 +146,43 @@ export const Dashboard: React.FC = () => {
             accept="image/*"
             style={{ display: 'none' }}
           />
-          <button 
-            className="upload-button"
+          <button
+            className="main-upload-button"
             onClick={triggerFileInput}
           >
-            Upload Screenshot
+            📸 Upload Screenshot
           </button>
-          
-          {selectedImage && (
-            <div className="image-preview">
-              <img 
-                src={selectedImage} 
-                alt="Preview" 
-                style={{ 
-                  maxWidth: '100%', 
-                  borderRadius: '12px',
-                  marginTop: '20px',
-                  border: '2px solid rgba(255, 255, 255, 0.2)'
-                }} 
-              />
-            </div>
-          )}
+
+          {/* Tabs */}
+          <div className="tabs-container">
+            <button
+              className={`tab ${activeTab === 'analysis' ? 'active' : ''}`}
+              onClick={() => setActiveTab('analysis')}
+            >
+              📊 Analyze your Rizz
+            </button>
+          </div>
         </div>
 
-        <button 
-          onClick={handleLogout} 
-          className="logout-button"
-        >
-          Logout
-        </button>
-        <h1>🎉 Welcome to HuzzAI Dashboard!</h1>
-        <p>Congratulations! You've successfully completed the onboarding process.</p>
-        
-        {auth?.user && (
-          <div style={{ marginBottom: '30px' }}>
-            <h2>Hello, {auth.user.first_name} {auth.user.last_name}!</h2>
-            <p>Email: {auth.user.email}</p>
+        {/* Image Preview */}
+        {selectedImage && (
+          <div className="image-preview">
+            <img
+              src={selectedImage}
+              alt="Upload preview"
+              className="preview-image"
+            />
           </div>
         )}
-        
-        <div style={{ 
-          background: 'rgba(255, 255, 255, 0.1)', 
-          padding: '20px', 
-          borderRadius: '10px',
-          marginBottom: '30px'
-        }}>
-          <h3>Your AI-powered dating assistant is ready!</h3>
-          <p>Your preferences have been saved and your personalized experience is being prepared.</p>
-        </div>
-        
-        <button 
-          onClick={handleLogout}
-          style={{
-            background: 'rgba(255, 255, 255, 0.2)',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-            color: 'white',
-            padding: '12px 24px',
-            borderRadius: '25px',
-            cursor: 'pointer',
-            fontSize: '16px'
-          }}
-        >
-          Logout
+      </div>
+
+      {/* Bottom Navigation Bar */}
+      <div className="bottom-navbar">
+        <button className="nav-btn active" title="Home">
+          🏠
+        </button>
+        <button className="nav-btn" onClick={handleLogout} title="Settings">
+          ⚙️
         </button>
       </div>
     </div>
