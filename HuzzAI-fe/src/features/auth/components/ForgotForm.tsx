@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { authAPI } from "../auth.api";
 import { useNavigate } from "react-router-dom";
 
 export default function ForgotForm() {
@@ -32,17 +31,12 @@ export default function ForgotForm() {
     
     try {
       console.log('Attempting to send password reset email to:', email);
-      const response = await authAPI.forgotPassword(email);
-      console.log('Password reset response:', response);
-      
-      // Show success message (don't reveal if email exists for security)
-      setSuccess("If an account exists with this email, you will receive password reset instructions shortly. Please check your inbox and follow the link to reset your password.");
-      setEmail(""); // Clear the email field after successful submission
+      // Navigate to the create new account message page
+      navigate('/forgot-password/message');
     } catch (err: any) {
       console.error('Forgot password error:', err);
       // Show a user-friendly error message
       setError(err.message || "An error occurred while processing your request. Please try again.");
-    } finally {
       setLoading(false);
     }
   };
@@ -56,7 +50,6 @@ export default function ForgotForm() {
         console.log('Form onSubmit triggered');
         handleSubmit(e);
       }}
-      style={{ border: '1px solid red', padding: '10px' }} // Temporary visual indicator
     >
       <div className="form-group">
         <label htmlFor="email" className="form-label">Email Address</label>
