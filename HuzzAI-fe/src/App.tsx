@@ -6,6 +6,8 @@ import SignupPage from './features/auth/pages/SignupPage';
 import ForgotPage from './features/auth/pages/ForgotPage';
 import ForgotMessagePage from './features/auth/pages/ForgotMessagePage';
 import ResetPage from './features/auth/pages/ResetPage';
+import { SelectMoodPage } from './pages/SelectMoodPage';
+import ResponsePage from './pages/ResponsePage';
 import { OnboardingFlow } from './features/onboarding/OnboardingFlow';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Dashboard } from './pages/Dashboard';
@@ -21,6 +23,12 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPage />} />
             <Route path="/forgot-password/message" element={<ForgotMessagePage />} />
             <Route path="/reset-password/:token" element={<ResetPage />} />
+            <Route path="/select-mood" element={<SelectMoodPage />} />
+            <Route path="/response" element={
+              <ProtectedRoute>
+                <ResponsePage />
+              </ProtectedRoute>
+            } />
             <Route path="/onboarding/*" element={
               <ProtectedRoute>
                 <OnboardingFlow />

@@ -2,13 +2,12 @@ import React from 'react';
 import { useAuth } from '../features/auth/userauth';
 import { authAPI } from '../features/auth/auth.api';
 import { useNavigate } from 'react-router-dom';
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import './Dashboard.css';
 
 export const Dashboard: React.FC = () => {
   const { auth, logout } = useAuth();
   const navigate = useNavigate();
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleLogout = () => {
@@ -21,9 +20,13 @@ export const Dashboard: React.FC = () => {
     const file = event.target.files?.[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
-      setSelectedImage(imageUrl);
-      // Here you can handle the image file (upload to server, etc.)
-      console.log('Selected file:', file);
+      // Navigate to mood selection page with both image URL and file object
+      navigate('/select-mood', { 
+        state: { 
+          imageUrl,
+          imageFile: file // Pass the actual file object
+        } 
+      });
     }
   };
 
@@ -52,20 +55,7 @@ export const Dashboard: React.FC = () => {
             Upload Screenshot
           </button>
           
-          {selectedImage && (
-            <div className="image-preview">
-              <img 
-                src={selectedImage} 
-                alt="Preview" 
-                style={{ 
-                  maxWidth: '100%', 
-                  borderRadius: '12px',
-                  marginTop: '20px',
-                  border: '2px solid rgba(255, 255, 255, 0.2)'
-                }} 
-              />
-            </div>
-          )}
+
         </div>
 
         <button 
