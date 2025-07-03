@@ -1,7 +1,7 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { authAPI, type LoginData } from "../auth.api";
 import { useAuth } from "../userauth";
-import { useNavigate } from "react-router-dom";
 
 export default function LoginForm() {
   const { setAuth } = useAuth();
@@ -10,6 +10,7 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,24 +60,37 @@ export default function LoginForm() {
 
         <div className="form-group">
           <label className="form-label">Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="glass-input"
-            placeholder="Enter your password"
-          />
+          <div className="password-input-container">
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="glass-input"
+              placeholder="Enter your password"
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? "👁️" : "👁️‍🗨️"}
+            </button>
+          </div>
         </div>
 
         <div className="form-options">
-          <label className="remember-me">
-            <input type="checkbox" />
-            Remember me
+          <label className="show-password">
+            <input 
+              type="checkbox" 
+              checked={showPassword}
+              onChange={(e) => setShowPassword(e.target.checked)}
+            />
+            Show password
           </label>
-          <a href="#" className="forgot-password">
+          <Link to="/forgot-password" className="forgot-password">
             Forgot password?
-          </a>
+          </Link>
         </div>
 
         {error && <div className="error-message">{error}</div>}

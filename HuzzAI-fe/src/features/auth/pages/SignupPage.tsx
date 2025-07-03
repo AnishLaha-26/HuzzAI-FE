@@ -31,7 +31,7 @@ export default function SignupPage() {
               onClick={handleLoginClick}
               type="button"
             >
-              Sign In
+              Login
             </button>
           </div>
         </div>

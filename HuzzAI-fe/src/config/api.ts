@@ -12,7 +12,7 @@ const getBackendUrl = (): string => {
   
   // If we're on localhost, backend is probably on localhost too
   if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
-    const backendUrl = 'http://localhost:8000/api';
+    const backendUrl = 'http://127.0.0.1:8000/api';
     console.log('Development mode - using localhost backend:', backendUrl);
     return backendUrl;
   }

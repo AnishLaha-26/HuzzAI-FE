@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState } from "react";
 
 export type AuthData = {
   accessToken: string;
+  refresh?: string; // Optional refresh token
   user?: {
     id: number;
     email: string;
@@ -32,11 +33,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   });
 
   const setAuth = (data: AuthData) => {
+    // Store tokens and user data in localStorage
     localStorage.setItem("accessToken", data.accessToken);
+    // Store refresh token if it exists in the data
+    if ('refresh' in data) {
+      localStorage.setItem("refreshToken", data.refresh as string);
+    }
+    // Store user data if it exists
     if (data.user) {
       localStorage.setItem("user", JSON.stringify(data.user));
     }
-    setAuthState(data);
+    // Update auth state
+    setAuthState({
+      accessToken: data.accessToken,
+      user: data.user
+    });
   };
 
   const logout = () => {
