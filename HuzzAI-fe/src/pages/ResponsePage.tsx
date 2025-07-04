@@ -1,14 +1,18 @@
+import { useAuth } from '../features/auth/userauth';
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './ResponsePage.css';
+import { fileToBase64 } from '../utils/filetoBase64';
 
 const ResponsePage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const [spiceLevel, setSpiceLevel] = useState<number>(5);
+  const [spice_level, setSpiceLevel] = useState<number>(5);
   const [mood, setMood] = useState<string>('flirty');
   const location = useLocation();
   const navigate = useNavigate();
+  const { auth } = useAuth();               // ① grab token from context
+  const accessToken = auth?.accessToken;  
   
   // Get initial values from location state
   const { 
@@ -23,90 +27,51 @@ const ResponsePage = () => {
   const [response, setResponse] = useState<string>('');
 
   const fetchAIResponse = async () => {
-    if (!imageFile) {
-      setError('Please upload an image first');
+    if (!imageFile || !accessToken) {
+      navigate('/login', { state: { from: location.pathname } });
       return;
     }
-
+  
     try {
       setIsLoading(true);
       setError('');
-      setResponse('');
-
-      const formData = new FormData();
-      formData.append('image', imageFile);
-      formData.append('mood', mood);
-      formData.append('spiceLevel', spiceLevel.toString());
-
-      // Get the auth token from localStorage
-      const userToken = localStorage.getItem('authToken');
+  
+      // Convert image to base64
+      const base64Image = await fileToBase64(imageFile);
       
-      if (!userToken) {
-        // Redirect to login if not authenticated
-        navigate('/login', { state: { from: location.pathname } });
-        return;
-      }
-
-      // Replace with your actual backend URL
-      const response = await fetch('http://your-backend-url/api/analyzer/generate-response/', {
+      // Create the request payload
+      const payload = {
+        mood,
+        spiceLevel: spice_level,
+        image: base64Image
+      };
+  
+      const res = await fetch('http://localhost:8000/api/analyzer/generate-response/', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${userToken}`
+        headers: { 
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
         },
-        body: formData
+        body: JSON.stringify(payload)
       });
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(responseData.message || 'Failed to generate response');
+  
+      if (!res.ok) {
+        throw new Error('Failed to get response from AI');
       }
-
-      if (responseData.status === 'success') {
-        setResponse(responseData.data?.response || 'No response generated');
-      } else {
-        throw new Error(responseData.message || 'Something went wrong');
-      }
+  
+      const data = await res.json();
+      setResponse(data.data.response);
+  
     } catch (err) {
-      console.error('Error generating AI response:', err);
-      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
-      setError(errorMessage);
-      setResponse("Sorry, we couldn't generate a response. Please try again.");
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Call fetchAIResponse when component mounts with an image file
   useEffect(() => {
-    if (initialImageFile) {
-      fetchAIResponse();
-    }
-  }, [initialImageFile]);
-
-  // Mock response generation for demo purposes
-  useEffect(() => {
-    if (!initialImageFile) return;
-    
-    const generateMockResponse = async () => {
-      setIsLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const responses = {
-        flirty: "Hey there! I couldn't help but notice your smile in your profile picture. It's making me forget my pickup line... guess you have that effect on people 😉",
-        funny: "Are you a magician? Because whenever I look at your profile, everyone else disappears! (Too cheesy? I'll show myself out... 🚪🏃‍♂️)",
-        sweet: "I just wanted to say your profile really stood out to me. There's a warmth in your eyes that made me want to reach out and say hello! 🌟",
-        mysterious: "I'd tell you a joke about time travel, but you didn't like it... yet. 😏",
-        sarcastic: "Oh great, another match. I was just running low on people to ignore my terrible jokes. Let's be terrible together? 🙃",
-        romantic: "I was going to send you a message about how beautiful you are, but then I realized that no words could do justice to what I see in your photos. So I'll just say this: your smile made me stop scrolling. 🌹"
-      };
-      
-      setResponse(responses[mood as keyof typeof responses] || responses.flirty);
-      setIsLoading(false);
-    };
-
-    generateMockResponse();
-  }, [mood, spiceLevel, initialImageFile]);
+    if (imageFile) fetchAIResponse();
+  }, [imageFile, mood, spice_level]);
 
   const handleRegenerate = () => {
     setIsLoading(true);
@@ -176,12 +141,12 @@ const ResponsePage = () => {
       </div>
 
       <div className="spice-control">
-        <label>Spice Level: {spiceLevel}/10</label>
+        <label>Spice Level: {spice_level}/10</label>
         <input
           type="range"
           min="1"
           max="10"
-          value={spiceLevel}
+          value={spice_level}
           onChange={(e) => setSpiceLevel(parseInt(e.target.value))}
           className="spice-slider"
         />

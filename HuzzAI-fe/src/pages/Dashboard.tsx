@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../features/auth/userauth';
 import { authAPI } from '../features/auth/auth.api';
 import { useNavigate } from 'react-router-dom';
-import { useRef } from 'react';
 import './Dashboard.css';
 
 const RIZZ_DROPS = [
