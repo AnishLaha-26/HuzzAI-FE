@@ -11,6 +11,7 @@ import ResponsePage from './pages/ResponsePage';
 import { OnboardingFlow } from './features/onboarding/OnboardingFlow';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Dashboard } from './pages/Dashboard';
+import { LoadingScreen } from './features/loading/pages/LoadingScreen';
 
 function App() {
   return (
@@ -32,6 +33,11 @@ function App() {
             <Route path="/onboarding/*" element={
               <ProtectedRoute>
                 <OnboardingFlow />
+              </ProtectedRoute>
+            } />
+            <Route path="/loading" element={
+              <ProtectedRoute>
+                <LoadingScreen />
               </ProtectedRoute>
             } />
             <Route path="/dashboard" element={

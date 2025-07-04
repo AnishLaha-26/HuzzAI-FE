@@ -17,8 +17,8 @@ export const FinalSubmit: React.FC<FinalSubmitProps> = ({ onSubmit, onBack }) =>
     setLocalError(null);
     try {
       await submitPreferences();
-      // Navigate to dashboard or home page after successful submission
-      navigate('/dashboard');
+      // Redirect to loading screen after successful onboarding
+      navigate('/loading');
     } catch (error) {
       console.error('Failed to submit preferences:', error);
       setLocalError('Failed to save your preferences. Please try again.');

@@ -7,11 +7,7 @@ const API = axios.create({
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json',
   },
-  withCredentials: true, // Important for cookies/sessions
-  xsrfCookieName: 'csrftoken',
-  xsrfHeaderName: 'X-CSRFToken',
 });
 
 // Request interceptor to add auth token
@@ -92,79 +88,14 @@ export interface AuthResponse {
 export const authAPI = {
   // User Registration
   register: async (userData: RegisterData): Promise<AuthResponse> => {
-    try {
-      const url = '/accounts/register/';
-      const data = {
-        email: userData.email,
-        password: userData.password,
-        password2: userData.password2,
-        first_name: userData.first_name,
-        last_name: userData.last_name,
-      };
-      
-      console.log('Sending registration request to:', API.defaults.baseURL + url);
-      console.log('Registration data:', JSON.stringify(data, null, 2));
-      
-      const response = await API.post(url, data, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      });
-      
-      console.log('Registration successful, response:', response);
-      
-      const { access, refresh, user } = response.data;
-      
-      if (!access || !refresh) {
-        throw new Error('Missing authentication tokens in response');
-      }
-      
-      // Store tokens
-      localStorage.setItem('accessToken', access);
-      localStorage.setItem('refreshToken', refresh);
-      
-      // Ensure user data is properly formatted
-      if (!user) {
-        console.warn('No user data in registration response, using partial data');
-        response.data.user = {
-          id: response.data.user_id || 0,
-          email: userData.email,
-          first_name: userData.first_name,
-          last_name: userData.last_name
-        };
-      }
-      
-      return response.data;
-    } catch (error: unknown) {
-      console.error('Registration API error:', error);
-      
-      // Type guard to check if error is an AxiosError
-      if (axios.isAxiosError(error)) {
-        if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          console.error('Response data:', error.response.data);
-          console.error('Status:', error.response.status);
-          console.error('Headers:', error.response.headers);
-        } else if (error.request) {
-          // The request was made but no response was received
-          console.error('No response received:', error.request);
-        } else {
-          // Something happened in setting up the request that triggered an Error
-          console.error('Error:', error.message);
-        }
-      } else if (error instanceof Error) {
-        // Handle standard JavaScript errors
-        console.error('Error:', error.message);
-      } else {
-        // Handle any other type of error
-        console.error('An unknown error occurred');
-      }
-      
-      // Re-throw to be handled by the component
-      throw error;
-    }
+    const response = await API.post('/accounts/register/', userData);
+    const { access, refresh } = response.data;
+    
+    // Store tokens
+    localStorage.setItem('accessToken', access);
+    localStorage.setItem('refreshToken', refresh);
+    
+    return response.data;
   },
 
   // User Login
@@ -214,64 +145,9 @@ export const authAPI = {
   },
   
   // Forgot Password
-  forgotPassword(email: string): Promise<{ message: string }> {
-    return API.post(
-      '/accounts/forgot-password/',  // Removed leading /api/ since it's in baseURL
-      { email },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      }
-    )
-    .then(response => {
-      console.log('Forgot password response:', response);
-      return response.data;
-    })
-    .catch(error => {
-      console.error('Forgot password API error:', error);
-      if (error.response) {
-        console.error('Response data:', error.response.data);
-        console.error('Status:', error.response.status);
-      }
-      // Return a more user-friendly error message
-      throw new Error('Failed to send password reset email. Please try again later.');
-    });
-  },
-  
-  // Check if reset link is valid
-  checkResetLink(uidb64: string, token: string): Promise<{ valid: boolean }> {
-    return API.get('/accounts/check-reset-link/', {
-      params: { uidb64, token }
-    })
-    .then(response => response.data)
-    .catch(error => {
-      console.error('Reset link validation error:', error);
-      throw new Error('This password reset link is invalid or has expired.');
-    });
-  },
-
-  // Reset Password
-  resetPassword(uidb64: string, token: string, newPassword: string): Promise<{ detail: string }> {
-    return API.post('/accounts/password/reset/confirm/', { 
-      uid: uidb64,
-      token,
-      new_password1: newPassword,
-      new_password2: newPassword
-    })
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Reset password error:', error);
-        if (error.response) {
-          console.error('Response data:', error.response.data);
-          console.error('Status:', error.response.status);
-          console.error('Headers:', error.response.headers);
-        } else if (error.request) {
-          console.error('No response received:', error.request);
-        }
-        throw error;
-      });
+  forgotPassword: async (email: string): Promise<{ detail: string }> => {
+    const response = await API.post('/accounts/password/reset/', { email });
+    return response.data;
   }
 };
 

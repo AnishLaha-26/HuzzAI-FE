@@ -19,35 +19,31 @@ export default function SignupForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError('');
+    setLoading(true);
 
-    // Validate form fields
+    // Validate form
     if (!email || !password || !confirmPassword || !firstName || !lastName) {
-      setError("All fields are required");
+      setError('All fields are required');
+      setLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError('Passwords do not match');
+      setLoading(false);
       return;
     }
 
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters long");
-      return;
-    }
-
-    setLoading(true);
-    
     try {
-      // Log the form data being submitted
-      console.log('Form data being submitted:', {
+      console.log('Attempting to register user...', {
         email,
         password: password ? '[PROVIDED]' : '[MISSING]',
         password2: confirmPassword ? '[PROVIDED]' : '[MISSING]',
         first_name: firstName,
         last_name: lastName
       });
+      
       const registerData: RegisterData = {
         email,
         password,
@@ -56,15 +52,22 @@ export default function SignupForm() {
         last_name: lastName
       };
       
-      const response = await authAPI.register(registerData);
+      const response = await authAPI.register(registerData).catch(error => {
+        console.error('Registration error:', error);
+        if (error.message.includes('Network Error') || error.message.includes('Failed to fetch')) {
+          throw new Error('Unable to connect to the server. Please check your internet connection and ensure the backend is running.');
+        }
+        throw error;
+      });
+      
       console.log('Registration response:', response);
       
       // Set auth with the correct format including refresh token
       setAuth({
         accessToken: response.access,
-        refresh: response.refresh, // Include refresh token
+        refresh: response.refresh,
         user: response.user || {
-          id: 0, // Temporary ID, will be updated from the server
+          id: 0,
           email: email,
           first_name: firstName,
           last_name: lastName
@@ -74,35 +77,13 @@ export default function SignupForm() {
       // Navigate to onboarding after successful registration
       navigate('/onboarding/step1');
     } catch (err: any) {
-      console.error('Registration error:', err);
-      
-      // Log full error details for debugging
-      if (err.response) {
-        console.error('Response data:', err.response.data);
-        console.error('Status:', err.response.status);
-        console.error('Headers:', err.response.headers);
-      } else if (err.request) {
-        console.error('No response received:', err.request);
-      }
-      
-      // Set user-friendly error message
-      if (err.response?.data?.email) {
-        setError(`Email error: ${Array.isArray(err.response.data.email) ? err.response.data.email[0] : err.response.data.email}`);
-      } else if (err.response?.data?.password) {
-        setError(`Password error: ${Array.isArray(err.response.data.password) ? err.response.data.password[0] : err.response.data.password}`);
-      } else if (err.response?.data?.password2) {
-        setError(`Password confirmation error: ${Array.isArray(err.response.data.password2) ? err.response.data.password2[0] : err.response.data.password2}`);
-      } else if (err.response?.data?.non_field_errors) {
-        setError(Array.isArray(err.response.data.non_field_errors) 
-          ? err.response.data.non_field_errors[0] 
-          : err.response.data.non_field_errors);
-      } else if (err.message) {
-        setError(err.message);
-      } else if (err.request) {
-        setError('No response from server. Please check your connection.');
-      } else {
-        setError('Registration failed. Please try again.');
-      }
+      console.error('Registration failed:', err);
+      setError(
+        err.response?.data?.detail || 
+        err.response?.data?.message || 
+        err.message || 
+        'Registration failed. Please try again.'
+      );
     } finally {
       setLoading(false);
     }
