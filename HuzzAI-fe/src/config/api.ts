@@ -1,29 +1,26 @@
 /**
- * Dynamic API Configuration
- * Automatically detects the appropriate backend URL based on the current environment
+ * API Configuration
+ * Manages backend URL resolution based on environment
  */
 
 const getBackendUrl = (): string => {
-  const currentHost = window.location.hostname;
-  const currentPort = window.location.port;
+  const isLocal = window.location.hostname === 'localhost' || 
+                 window.location.hostname.startsWith('127.') ||
+                 window.location.hostname.endsWith('.local');
   
-  console.log('🔍 Frontend Details:', {
-    host: currentHost,
-    port: currentPort,
-    fullUrl: window.location.href
-  });
-  
-  // If accessing via localhost/127.0.0.1, use localhost backend
-  if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+  // Development: Localhost
+  if (isLocal) {
     const devUrl = 'http://localhost:8001/api';
     console.log('🏠 Local development - using backend:', devUrl);
     return devUrl;
   }
   
-  // If accessing via network IP, use same IP for backend
-  const networkUrl = `http://${currentHost}:8001/api`;
-  console.log('🌐 Network access - using backend:', networkUrl);
-  return networkUrl;
+  // Production: Use environment variable if set, otherwise fallback to production URL
+  const prodUrl = import.meta.env.VITE_BACKEND_URL || 'https://huzzai-be.onrender.com';
+  const apiUrl = `${prodUrl}${prodUrl.endsWith('/') ? '' : '/'}api`;
+  
+  console.log('🚀 Production environment - using backend:', apiUrl);
+  return apiUrl;
 };
 
 // Create a function to test backend connection
