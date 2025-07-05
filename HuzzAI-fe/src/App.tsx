@@ -12,6 +12,8 @@ import { OnboardingFlow } from './features/onboarding/OnboardingFlow';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Dashboard } from './pages/Dashboard';
 import { LoadingScreen } from './features/loading/pages/LoadingScreen';
+import { RizzUploadPage } from './features/rizz-analysis/pages/RizzUploadPage';
+import { RizzResultsPage } from './features/rizz-analysis/pages/RizzResultsPage';
 
 function App() {
   return (
@@ -43,6 +45,21 @@ function App() {
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/rizz-analysis/upload" element={
+              <ProtectedRoute>
+                <RizzUploadPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/rizz-analysis/loading" element={
+              <ProtectedRoute>
+                <LoadingScreen />
+              </ProtectedRoute>
+            } />
+            <Route path="/rizz-analysis/results" element={
+              <ProtectedRoute>
+                <RizzResultsPage />
               </ProtectedRoute>
             } />
             <Route path="/" element={<Navigate to="/login" replace />} />

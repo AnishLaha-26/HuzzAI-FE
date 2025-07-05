@@ -15,13 +15,13 @@ const getBackendUrl = (): string => {
   
   // If accessing via localhost/127.0.0.1, use localhost backend
   if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
-    const devUrl = 'http://localhost:8000/api';
+    const devUrl = 'http://localhost:8001/api';
     console.log('🏠 Local development - using backend:', devUrl);
     return devUrl;
   }
   
   // If accessing via network IP, use same IP for backend
-  const networkUrl = `http://${currentHost}:8000/api`;
+  const networkUrl = `http://${currentHost}:8001/api`;
   console.log('🌐 Network access - using backend:', networkUrl);
   return networkUrl;
 };

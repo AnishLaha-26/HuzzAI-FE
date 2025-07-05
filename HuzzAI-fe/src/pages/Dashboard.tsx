@@ -5,15 +5,18 @@ import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 
 const RIZZ_DROPS = [
-  "You look like you ghost people and still get missed.",
-  "Trouble in your eyes, peace in your vibe. Dangerous combo.",
-  "Let's skip small talk. What's your love language?",
-  "You're the type of person I'd delete dating apps for.",
-  "Your vibe is unmatched, but let's match anyway.",
-  "I don't usually believe in love at first sight, but I'm willing to be wrong.",
-  "You're not just a snack, you're the whole meal prep.",
-  "I'd cross timezones just to hear you laugh."
+  "You just popped up and now my explore page feels irrelevant.",
+  "Okay, I’ll shoot my shot—what’s the story behind [insert story/highlight/photo]?",
+  "This might be forward but… you seem like someone I'd genuinely want to know. So hi.",
+  "I was gonna respond to your story with something clever but I got distracted by you looking this good.",
+  "You have main character energy. I’m just tryna be a recurring role.",
+  "I feel like you’d have elite music taste. Am I right or do I need to lower expectations?",
+  "Not to be dramatic but I think I found the reason I logged into Instagram today.",
+  "If confidence had a visual, it’d probably be your profile.",
+  "Do you always make followers regret not messaging sooner or is that just me?",
+  "This is me being brave. Please reward accordingly."
 ];
+
 
 const STEPS = [
   {
@@ -162,18 +165,26 @@ export const Dashboard: React.FC = () => {
           <div className="tabs-container">
             <button
               className={`tab ${activeTab === 'analysis' ? 'active' : ''}`}
-              onClick={() => setActiveTab('analysis')}
+              onClick={() => {
+                setActiveTab('analysis');
+                navigate('/rizz-analysis/upload');
+              }}
             >
-              📊 Analyze my Rizz
+              📊 Rate my Rizz
             </button>
+
+              {/* Fine Tune function - scope creep (POST MVP IMPLEMENT)}
+            {/*}
             <button
               className={`tab ${activeTab === 'fine-tune' ? 'active' : ''}`}
               onClick={() => setActiveTab('fine-tune')}
             >
              ✨ Fine-tune my Rizz
             </button>
+               */}
           </div>
         </div>
+     
 
         {/* Image Preview */}
         {selectedImage && (
@@ -190,3 +201,5 @@ export const Dashboard: React.FC = () => {
     </div>
   );
 };
+
+

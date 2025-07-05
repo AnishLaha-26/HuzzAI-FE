@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './LoadingScreen.css';
 
 const charismaTips = [
@@ -107,6 +107,7 @@ const charismaTips = [
 
 export const LoadingScreen = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [currentTip, setCurrentTip] = useState(Math.floor(Math.random() * charismaTips.length));
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -114,10 +115,24 @@ export const LoadingScreen = () => {
   const [backgroundVariant, setBackgroundVariant] = useState(0);
 
   useEffect(() => {
-    // Simple 30 second timer
+    // Check if we're in rizz analysis flow
+    const currentPath = window.location.pathname;
+    const isRizzAnalysis = currentPath.includes('/rizz-analysis');
+    
+    // Get analysis data from location state if available
+    const analysisData = location.state?.analysisData;
+    
+    // Timer duration based on context
     const timer = setTimeout(() => {
-      navigate('/dashboard');
-    }, 10000); // 30 seconds total
+      if (isRizzAnalysis) {
+        // Pass the analysis data forward to results page
+        navigate('/rizz-analysis/results', { 
+          state: { analysisData } 
+        });
+      } else {
+        navigate('/dashboard');
+      }
+    }, 10000); // 10 seconds total
 
     // Change tips every 6 seconds with random selection
     const tipInterval = setInterval(() => {
@@ -146,7 +161,7 @@ export const LoadingScreen = () => {
       clearTimeout(timer);
       clearInterval(tipInterval);
     };
-  }, [navigate]);
+  }, [navigate, location.state]);
 
   // Typewriter effect for current tip
   useEffect(() => {
@@ -246,7 +261,7 @@ export const LoadingScreen = () => {
             <span className="dot"></span>
             <span className="dot"></span>
           </div>
-          <div className="status-text">Crafting your charismatic persona</div>
+          <div className="status-text">This isn’t lag — it’s dramatic timing.</div>
         </div>
       </div>
     </div>

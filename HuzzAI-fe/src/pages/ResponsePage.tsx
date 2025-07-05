@@ -2,7 +2,8 @@ import { useAuth } from '../features/auth/userauth';
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './ResponsePage.css';
-import { fileToBase64 } from '../utils/filetoBase64';
+import { imageToBase64 } from '../utils/imageUtils';
+import { API_BASE_URL } from '../config/api';
 
 const ResponsePage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -24,7 +25,16 @@ const ResponsePage = () => {
   }) || {};
 
   const [imageFile] = useState<File | null>(initialImageFile);
-  const [response, setResponse] = useState<string>('');
+  interface AIResponse {
+    success: boolean;
+    reply: string;
+    mood: string;
+    spice_level: number;
+    prompt_used?: string;
+  }
+
+  const [response, setResponse] = useState<AIResponse | null>(null);
+  const [aiReply, setAiReply] = useState<string>('');
 
   const fetchAIResponse = async () => {
     if (!imageFile || !accessToken) {
@@ -37,16 +47,17 @@ const ResponsePage = () => {
       setError('');
   
       // Convert image to base64
-      const base64Image = await fileToBase64(imageFile);
+      const base64Image = await imageToBase64(imageFile);
       
       // Create the request payload
       const payload = {
         mood,
-        spiceLevel: spice_level,
+        spice_level: parseInt(spice_level.toString()), // Ensure it's an integer
         image: base64Image
       };
   
-      const res = await fetch('http://localhost:8000/api/analyzer/generate-response/', {
+      // Make sure this matches your Django URL pattern exactly
+      const res = await fetch(`${API_BASE_URL}/context-reply/analyze-image/`, {
         method: 'POST',
         headers: { 
           'Authorization': `Bearer ${accessToken}`,
@@ -60,7 +71,12 @@ const ResponsePage = () => {
       }
   
       const data = await res.json();
-      setResponse(data.data.response);
+      if (data.success && data.reply) {
+        setResponse(data);
+        setAiReply(data.reply);
+      } else {
+        throw new Error(data.message || 'Failed to generate response');
+      }
   
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -73,32 +89,56 @@ const ResponsePage = () => {
     if (imageFile) fetchAIResponse();
   }, [imageFile, mood, spice_level]);
 
-  const handleRegenerate = () => {
-    setIsLoading(true);
-    // Simulate API call to regenerate response
-    setTimeout(() => {
-      const responses = [
-        "I was going to send you a pickup line, but I'm afraid I'd mess it up. So... how about you just tell me your name and we'll pretend I'm smooth? 😅",
-        "Do you have a name or can I call you mine? (I'll show myself out after that one... 😬)",
-        "I was going to send you a clever message, but then I got nervous and wrote this instead. So... hi! 👋",
-        "I was going to send you a message about how beautiful you are, but then I realized that no words could do justice to what I see in your photos.",
-        "I was wondering if you'd like to chat? I promise I'm more interesting than my profile makes me seem!"
-      ];
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-      setResponse(randomResponse);
+  const handleRegenerate = async () => {
+    if (!imageFile || !accessToken) {
+      navigate('/login', { state: { from: location.pathname } });
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setError('');
+  
+      // Convert image to base64
+      const base64Image = await imageToBase64(imageFile);
+      
+      // Create the request payload with current settings
+      const payload = {
+        mood,
+        spice_level: parseInt(spice_level.toString()),
+        image: base64Image
+      };
+  
+      // Make the API request
+      const res = await fetch(`${API_BASE_URL}/context-reply/analyze-image/`, {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+  
+      if (!res.ok) {
+        throw new Error('Failed to regenerate response from AI');
+      }
+  
+      const data = await res.json();
+      if (data.success && data.reply) {
+        setResponse(data);
+        setAiReply(data.reply);
+      } else {
+        throw new Error(data.message || 'Failed to generate new response');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
-  const handleCopyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(response);
-      // Optional: Show a toast or notification that text was copied
-      alert('Response copied to clipboard!');
-    } catch (err) {
-      console.error('Failed to copy text: ', err);
-      setError('Failed to copy text to clipboard');
-    }
+  const handleBackToDashboard = () => {
+    navigate('/dashboard');
   };
 
   // Mood selection handler
@@ -108,8 +148,12 @@ const ResponsePage = () => {
 
   return (
     <div className="response-container">
-      <h1>Your Response is Ready!</h1>
-      
+      <div className="header-section">
+        <div className="logo-container">
+          <img src="/huzzlogo.png" alt="HuzzAI Logo" className="logo-image" />
+          <h1 className="logo-text">HuzzAI</h1>
+        </div>
+      </div>
       {error && <div className="error-message">{error}</div>}
       
       <div className="screenshot-preview">
@@ -117,26 +161,60 @@ const ResponsePage = () => {
       </div>
 
       <div className="mood-selector">
-        <p>Select a mood:</p>
+        <h3>Select Mood:</h3>
         <div className="mood-buttons">
-          {['flirty', 'funny', 'sweet', 'mysterious', 'sarcastic', 'romantic'].map((m) => (
+          {[
+            { value: 'flirty', emoji: '😉' },
+            { value: 'funny', emoji: '😂' },
+            { value: 'sweet', emoji: '🥰' },
+            { value: 'mysterious', emoji: '🕵️‍♂️' },
+            { value: 'sarcastic', emoji: '😏' },
+            { value: 'romantic', emoji: '💘' }
+          ].map(({ value, emoji }) => (
             <button
-              key={m}
-              className={`mood-btn ${mood === m ? 'active' : ''}`}
-              onClick={() => handleMoodChange(m)}
+              key={value}
+              className={`mood-btn ${mood === value ? 'active' : ''}`}
+              onClick={() => handleMoodChange(value)}
             >
-              {m.charAt(0).toUpperCase() + m.slice(1)}
+              <span className="mood-emoji">{emoji}</span>
+              <span>{value.charAt(0).toUpperCase() + value.slice(1)}</span>
             </button>
           ))}
         </div>
       </div>
 
       <div className="ai-response">
-        <h3>AI Suggestion:</h3>
+        <h3>AI Suggestion</h3>
         {isLoading ? (
-          <div className="loading-spinner">Generating response...</div>
+          <div className="loading-container">
+            <div className="loading-content">
+              <div className="loading-text">Crafting your perfect response...</div>
+              <div className="progress-bar">
+                <div className="progress-fill"></div>
+              </div>
+              <div className="loading-subtext">This usually takes 5-10 seconds</div>
+            </div>
+          </div>
+        ) : response ? (
+          <div className="response-details">
+            <div className="response-meta">
+              <span className="response-mood">
+                Mood: <strong>{response.mood.charAt(0).toUpperCase() + response.mood.slice(1)}</strong>
+              </span>
+              <span className="response-spice">
+                Spice Level: <strong>{response.spice_level}/10</strong>
+              </span>
+            </div>
+            <div className="response-text">
+              {aiReply.split('\n').map((line, i) => (
+                <p key={i} style={{ margin: i > 0 ? '1rem 0 0' : '0' }}>{line}</p>
+              ))}
+            </div>
+          </div>
         ) : (
-          <div className="response-text">{response}</div>
+          <div className="no-response">
+            No response generated yet. Adjust your settings and try again.
+          </div>
         )}
       </div>
 
@@ -161,11 +239,11 @@ const ResponsePage = () => {
           {isLoading ? 'Generating...' : 'Rizz Again'}
         </button>
         <button 
-          className="copy-btn" 
-          onClick={handleCopyToClipboard}
-          disabled={isLoading || !response}
+          className="back-to-dashboard"
+          onClick={handleBackToDashboard}
+          disabled={isLoading}
         >
-          Copy to Clipboard
+          ← Back to Dashboard
         </button>
       </div>
     </div>
