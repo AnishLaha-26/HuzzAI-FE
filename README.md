@@ -30,7 +30,7 @@
 
 ## 🏝️ Made at Shipwrecked
 
-This project was built at [**Shipwrecked**](https://shipwrecked.hackclub.com), the world's first hackathon on an island 🌴 — where hackers build under the stars, by the sea.
+This project was built for [**Shipwrecked**](https://shipwrecked.hackclub.com), the world's first hackathon on an island 🌴 — where hackers build under the stars, by the sea.
 
 ---
 
