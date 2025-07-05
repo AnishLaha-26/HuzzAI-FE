@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../features/auth/userauth';
-import { authAPI } from '../features/auth/auth.api';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 
@@ -40,12 +39,11 @@ const STEPS = [
 ];
 
 export const Dashboard: React.FC = () => {
-  const { auth, logout } = useAuth();
+  const { auth } = useAuth();
   const navigate = useNavigate();
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [currentRizzDrop, setCurrentRizzDrop] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
-  const [activeTab, setActiveTab] = useState('analysis');
+  const [activeTab] = useState('analysis');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Auto-rotate rizz drops every 8 seconds
@@ -65,12 +63,6 @@ export const Dashboard: React.FC = () => {
     };
   }, []);
 
-  const handleLogout = () => {
-    authAPI.logout();
-    logout();
-    navigate('/login');
-  };
-
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -87,10 +79,6 @@ export const Dashboard: React.FC = () => {
 
   const triggerFileInput = () => {
     fileInputRef.current?.click();
-  };
-
-  const handleRizzDropRefresh = () => {
-    setCurrentRizzDrop(prev => (prev + 1) % RIZZ_DROPS.length);
   };
 
   const getGreetingText = () => {
@@ -165,10 +153,7 @@ export const Dashboard: React.FC = () => {
           <div className="tabs-container">
             <button
               className={`tab ${activeTab === 'analysis' ? 'active' : ''}`}
-              onClick={() => {
-                setActiveTab('analysis');
-                navigate('/rizz-analysis/upload');
-              }}
+              onClick={() => navigate('/rizz-analysis/upload')}
             >
               📊 Rate my Rizz
             </button>
@@ -186,16 +171,7 @@ export const Dashboard: React.FC = () => {
         </div>
      
 
-        {/* Image Preview */}
-        {selectedImage && (
-          <div className="image-preview">
-            <img
-              src={selectedImage}
-              alt="Upload preview"
-              className="preview-image"
-            />
-          </div>
-        )}
+
       </div>
 
     </div>

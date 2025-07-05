@@ -148,6 +148,20 @@ export const authAPI = {
   forgotPassword: async (email: string): Promise<{ detail: string }> => {
     const response = await API.post('/accounts/password/reset/', { email });
     return response.data;
+  },
+
+  // Check if password reset link is valid
+  checkResetLink: async (uidb64: string, token: string): Promise<{ valid: boolean }> => {
+    const response = await API.get(`/accounts/password/reset/verify/${uidb64}/${token}/`);
+    return response.data;
+  },
+
+  // Reset password with new password
+  resetPassword: async (uidb64: string, token: string, newPassword: string): Promise<{ detail: string }> => {
+    const response = await API.post(`/accounts/password/reset/confirm/${uidb64}/${token}/`, {
+      new_password: newPassword
+    });
+    return response.data;
   }
 };
 

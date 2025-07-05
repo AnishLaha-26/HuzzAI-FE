@@ -4,11 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import './FinalSubmit.css';
 
 interface FinalSubmitProps {
-  onSubmit: () => void;
   onBack: () => void;
 }
 
-export const FinalSubmit: React.FC<FinalSubmitProps> = ({ onSubmit, onBack }) => {
+export const FinalSubmit: React.FC<FinalSubmitProps> = ({ onBack }) => {
   const { formData, submitPreferences, isSubmitting, submissionError } = useOnboardingStore();
   const navigate = useNavigate();
   const [localError, setLocalError] = useState<string | null>(null);
